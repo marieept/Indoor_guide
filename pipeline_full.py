@@ -100,6 +100,27 @@ def build_graph_for_floor(floor: dict):
 
     all_floor_nodes = nav_nodes + rooms + transitions
 
+    import cv2
+
+    # Image de debug (copie)
+    debug_img = img_color.copy()
+
+    # ⚠️ IMPORTANT : utiliser les noeuds AVANT scaling
+    nodes_for_display = nav_nodes + rooms + transitions
+
+    for e in edges:
+        n1 = next(n for n in nodes_for_display if n["id"] == e["from"])
+        n2 = next(n for n in nodes_for_display if n["id"] == e["to"])
+
+        x1, y1 = int(n1["x"]), int(n1["y"])
+        x2, y2 = int(n2["x"]), int(n2["y"])
+
+        # Dessin de l'arête
+        cv2.line(debug_img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+
+    # Sauvegarde de l'image
+    cv2.imwrite(f"debug_edges_floor_{floor['floor']}.png", debug_img)
+
     # Rescaling des noeuds ET des poids en tout dernier
     for n in all_floor_nodes:
         n["x"] = int(n["x"] * sx)
