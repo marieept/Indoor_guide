@@ -1,0 +1,17 @@
+{
+  "output": "graph_.json",
+  "etages": [
+    {
+      "svg": "rdc2.svg",
+      "svg_display": "rdc_simple.svg",
+      "prefix": "f0",
+      "floor": 0
+    },
+    {
+      "svg": "f1.svg",
+      "svg_display": "f1.svg",
+      "prefix": "f1",
+      "floor": 1
+    }
+  ]
+}

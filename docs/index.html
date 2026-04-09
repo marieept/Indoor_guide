@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Navigation </title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/ui.js" defer></script>
+    <script src="js/tabs.js" defer></script>
+    <script src="js/map.js" defer></script>
+    <script src="js/graph.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <h1>Navigation Moho</h1>
+        <div class="header-right">
+            <img class="logo" src="assets/logo_isen.png" alt="Plan RDC"/>
+        </div>
+    </header>
+
+    <div class="main">
+        <aside class="sidebar active" id="panel-search">
+            <p class="guide">
+                Entrez un départ et une destination puis appuyez sur Calculer le chemin.
+            </p>
+            <h3>Point de départ</h3>
+            <div class="search-container">
+                <input id="search-start" placeholder="Rechercher une salle...">
+                <div id="suggestions-start"></div>
+            </div>
+
+            <h3>Point d'arrivée</h3>
+            <div class="search-container">
+                <input id="search-end" placeholder="Rechercher une salle...">
+                <div id="suggestions-end"></div>
+            </div>
+
+            <div class="info">
+                <p>Départ : <span id="lbl-start">-</span></p>
+                <p>Arrivée : <span id="lbl-end">-</span></p>
+            </div>
+
+            <label id="pmr-mode-label">
+                <input type="checkbox" id="pmr-mode"> Accès PMR (ascenseurs uniquement)
+            </label>
+            <button id="btn-calc" disabled>Calculer le chemin</button>
+            <button id="btn-reset" onclick="resetAll()">Réinitialiser</button>
+            <h3 id="title-instructions" style="display:none">Instructions</h3>
+            <div id="instructions"></div>
+
+            <div class="credits">
+                Projet ISEN par Boris Mock – Marie Epinat
+            </div>
+        
+        </aside>
+
+        <div class="map" id="panel-map">
+            <div id="floor-controls"></div>
+            <div id="map-wrapper">
+                <div id="map-svg-container">
+                    <img id="plan-img" src="assets/rdc_simple.svg" alt="Plan RDC"/>
+                    <svg id="overlay"></svg>
+                </div>
+            </div>
+
+            <button id="btn-calc-map" disabled onclick="calcPath()">↱</button>
+
+            <div id="zoom-controls">
+                <button onclick="zoom(1.2)">+</button>
+                <button onclick="zoom(0.8)">-</button>
+            </div>
+        </div>
+
+        <div id="panel-instructions">
+            <h3>Instructions</h3>
+            <div id="mobile-instructions-content">
+                <p>Calculez un chemin pour voir les instructions ici.</p>
+            </div>
+        </div> 
+    </div>
+</div>
+    </div>
+
+    <nav id="mobile-tabs">
+        <button class="tab-btn active" onclick="switchTab('search')" id="tab-search">
+            Recherche
+        </button>
+        <button class="tab-btn" onclick="switchTab('map')" id="tab-map">
+            Carte
+        </button>
+        <button class="tab-btn" onclick="switchTab('instructions')" id="tab-instructions">
+            Instructions
+        </button>
+    </nav>
+</body>
+</html>
