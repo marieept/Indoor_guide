@@ -4,7 +4,7 @@ import os
 
 # === CONFIG ===
 os.chdir(os.path.dirname(os.path.abspath(__file__))) # Se placer dans le dossier où est le script
-BASE_URL = "https://bmck972.github.io/Indoor_Guide/index.html"  # URL de base pour les QR codes
+BASE_URL = "https://marieept.github.io/Indoor_guide/index.html"  # URL de base pour les QR codes
 JSON_FILE = "graph_.json"               # Fichier JSON contenant les nodes
 OUTPUT_DIR = "qr_codes"                # Dossier où seront sauvegardés les QR codes
 
