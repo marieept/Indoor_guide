@@ -27,9 +27,20 @@ const container = document.getElementById('map-svg-container');
 const img = document.getElementById('plan-img');
 const wrapper =  document.getElementById('map-wrapper');
 
+var t0_load = performance.now();
+
 fetch('assets/graph.json')
     .then(r => r.json())
     .then(data => {
+        // Performances et tests
+        var t1_load = performance.now();
+        console.log('[PERF] - Chargement du graphe : ' + (t1_load - t0_load).toFixed(2) +' ms'
+            + ' avec' + data.nodes.length + ' noeuds et' + data.edges.length+ ' arêtes');
+
+        console.assert(data.nodes.length>0, '[TEST] - Le graphe ne contient aucun noeud');
+        console.assert(data.edges.length >0, '[TEST] - Le graphe ne contient aucune arête');
+        console.log('[TEST] - Structure du graphe OK');
+
         GRAPH = data;
         initMap();
         handleQRParams();

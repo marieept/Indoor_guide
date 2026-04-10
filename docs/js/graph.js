@@ -54,6 +54,10 @@ function initScores(){
     gScore[startNode.id]=0;
     fScore[startNode.id]= distance(startNode, endNode)
 
+    // Distance heuristique initiale
+    console.log('[INFO] - Distance euclidienne départ->arrivée (heuristique initiale) : '
+    +distance(startNode, endNode).toFixed(1) + ' px');
+
     return {gScore, fScore};
 }
 
@@ -121,6 +125,10 @@ function aStar(neighbors, gScore, fScore){
     //cameFrom = {}
     var cameFrom={};
 
+    //Compteurs et chrono
+    var nodesExplored = 0;
+    var t0_astart= performance.now();
+
     //Tant que toExplore n'est pas vide:
     while(toExplore.length>0){
         console.log('exploring', toExplore.length, 'nodes');
@@ -133,9 +141,27 @@ function aStar(neighbors, gScore, fScore){
             }
         }
 
+        //On compte chaque noeud traité
+        nodesExplored++;
+
         //Si current == arrivée -> reconstruire le chemin avec cameFrom
         if (current === endNode.id){
             pathNodes=reconstructPath(cameFrom);
+
+            // Résultat performance
+            var t1_astar = performance.now();
+            var duration = (t1_astar- t0_astart).toFixed(3);
+
+            console.log('[PERF] - Résultats A*');
+            console.log('[PERF] - Temps de calcul A* :' + duration+ ' ms');
+            console.log('[PERF] - Noeuds explorés :' + nodesExplored + '/' + GRAPH.nodes.length);
+
+            // Validation du chemin
+            console.assert(pathNodes.length >=2, '[TEST] - Le chemin doit contenir au moins 2 noeuds');
+            console.assert(pathNodes[0].id === startNode.id, '[TEST] - Premier noeud != départ');
+            console.assert(pathNodes[pathNodes.length -1].id ===  endNode.id, '[TEST] - Dernier noeud != arrivée');
+            console.log('[TEST] - Chemin valide :'+ startNode.label + '->' + endNode.label + '(' + pathNodes.length + ' noeuds');
+
             displayResult();
             return true;
         }
@@ -169,10 +195,20 @@ function aStar(neighbors, gScore, fScore){
         }
     }
 
+    // Aucun chemin trouvé
+    var t1_astar = performance.now();
+    console.warn('[PERF] - Aucun chemin trouvé')
+
     return false;
 }
 
 function calcPath() {
+    // Résumé des informations demandées
+    console.log('[INFO] - Calcul du chemin demandé');
+    console.log('[INFO] - Départ :' + startNode.label +' (id=' + startNode.id + ', étage=' + startNode.floor + ')');
+    console.log('[INFO] - Arrivée : ' + endNode.label   + ' (id=' + endNode.id   + ', étage=' + endNode.floor   + ')');
+    console.log('[INFO] - Mode PMR : ' + (document.getElementById('pmr-mode').checked ? 'activé' : 'désactivé'));
+
     var neighbors = initNeighbors();
     var { gScore, fScore } = initScores();
     var found = aStar(neighbors, gScore, fScore);
