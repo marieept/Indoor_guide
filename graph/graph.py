@@ -391,7 +391,7 @@ def generate_edges(nodes, navigable, floor):
     seen= set() #liste sans doublon
 
     for i, p in enumerate(coord_list):
-        index = tree.query_ball_point(p, r=700) #retourn les positions dans coord_list des points qui sont dans le rayon
+        index = tree.query_ball_point(p, r=300) #retourn les positions dans coord_list des points qui sont dans le rayon
         for j in index:
             if i!=j and (min(i,j), max(i,j)) not in seen : #force le plus petit index en premier pour repérer A->B et B->A
                if path_clear(navigable, p, coord_list[j]):

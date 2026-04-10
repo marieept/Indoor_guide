@@ -112,8 +112,8 @@ def build_graph_for_floor(floor: dict):
         n1 = next(n for n in nodes_for_display if n["id"] == e["from"])
         n2 = next(n for n in nodes_for_display if n["id"] == e["to"])
 
-        x1, y1 = int(n1["x"]), int(n1["y"])
-        x2, y2 = int(n2["x"]), int(n2["y"])
+        x1, y1 = int(n1["x"]) //4, int(n1["y"])//4
+        x2, y2 = int(n2["x"]) //4, int(n2["y"])//4
 
         # Dessin de l'arête
         cv2.line(debug_img, (x1, y1), (x2, y2), (0, 0, 255), 2)
