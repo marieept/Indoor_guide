@@ -405,26 +405,37 @@ def generate_edges(nodes, navigable, floor):
 
     return edges
 
-def connect_nodes(nodes, rooms, transitions, edges, floor):
+def connect_nodes(nodes, rooms, transitions, edges, floor, navigable):
     for room in rooms:
-        closest, min_d = get_nearest_node(room['x']//4, room['y']//4,nodes)
-        if closest:
-            edges.append({
-                "from": room['id'],
-                "to": closest['id'],
-                "weight": euclidian_distance(room['x'], room['y'], closest['x'], closest['y']),
-                "floor": floor['floor']
-            })
+        candidates = sorted(nodes, key=lambda n: euclidian_distance(
+            room['x']//4, room['y']//4, n['x']//4, n['y']//4))
+        for closest in candidates[:5]:
+            if path_clear(navigable, (room['x']//4, room['y']//4),
+                                      (closest['x']//4, closest['y']//4)):
+                edges.append({
+                    "from": room['id'],
+                    "to": closest['id'],
+                    "weight": euclidian_distance(room['x'], room['y'],
+                                                  closest['x'], closest['y']),
+                    "floor": floor['floor']
+                })
+                break
 
     for transition in transitions:
-        closest, min_d = get_nearest_node(transition['x']//4, transition['y']//4,nodes)
-        if closest:
-            edges.append({
-                "from": transition['id'],
-                "to": closest['id'],
-                "weight": euclidian_distance(transition['x'], transition['y'], closest['x'], closest['y']),
-                "floor": floor['floor']
-            })
+        candidates = sorted(nodes, key=lambda n: euclidian_distance(
+            transition['x']//4, transition['y']//4, n['x']//4, n['y']//4))
+        for closest in candidates[:5]:
+            if path_clear(navigable, (transition['x']//4, transition['y']//4),
+                                      (closest['x']//4, closest['y']//4)):
+                edges.append({
+                    "from": transition['id'],
+                    "to": closest['id'],
+                    "weight": euclidian_distance(transition['x'], transition['y'],
+                                                  closest['x'], closest['y']),
+                    "floor": floor['floor']
+                })
+                break
+
     return edges
 
 def merge_and_save(all_nodes, all_edges, config):
@@ -474,7 +485,7 @@ if __name__ == "__main__":
         transitions = put_transitions(floor)
         edges = generate_edges(nav_nodes, navigable, floor)
         edges = put_stairs_pmr(nav_nodes, edges, floor)
-        edges = connect_nodes(nav_nodes, rooms, transitions, edges, floor)
+        edges = connect_nodes(nav_nodes, rooms, transitions, edges, floor, navigable)
 
         for n in nav_nodes + rooms + transitions:
             all_nodes.append(n)

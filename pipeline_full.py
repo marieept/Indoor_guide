@@ -96,7 +96,7 @@ def build_graph_for_floor(floor: dict):
 
     edges = generate_edges(nav_nodes, navigable, floor)
     edges = put_stairs_pmr(nav_nodes, edges, floor)
-    edges = connect_nodes(nav_nodes, rooms, transitions, edges, floor)
+    edges = connect_nodes(nav_nodes, rooms, transitions, edges, floor, navigable)
 
     all_floor_nodes = nav_nodes + rooms + transitions
 
