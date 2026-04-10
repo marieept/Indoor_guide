@@ -131,7 +131,6 @@ function aStar(neighbors, gScore, fScore){
 
     //Tant que toExplore n'est pas vide:
     while(toExplore.length>0){
-        console.log('exploring', toExplore.length, 'nodes');
         //current = noeud avec le plus petit fScore dans toExplore
         var current = toExplore[0];
 
