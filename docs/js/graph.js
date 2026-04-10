@@ -70,7 +70,7 @@ function getNodeById(id){
             return GRAPH.nodes[j];
         }
     }
-    console.log("ID non trouvé dans GRAPH :", id);
+    console.log("ID non trouvé dans GRAPH : ", id);
     return null;
 }
 
@@ -153,8 +153,8 @@ function aStar(neighbors, gScore, fScore){
             var duration = (t1_astar- t0_astart).toFixed(3);
 
             console.log('[PERF] - Résultats A*');
-            console.log('[PERF] - Temps de calcul A* :' + duration+ ' ms');
-            console.log('[PERF] - Noeuds explorés :' + nodesExplored + '/' + GRAPH.nodes.length);
+            console.log('[PERF] - Temps de calcul A* : ' + duration+ ' ms');
+            console.log('[PERF] - Noeuds explorés : ' + nodesExplored + '/' + GRAPH.nodes.length);
 
             // Validation du chemin
             console.assert(pathNodes.length >=2, '[TEST] - Le chemin doit contenir au moins 2 noeuds');
@@ -205,7 +205,7 @@ function aStar(neighbors, gScore, fScore){
 function calcPath() {
     // Résumé des informations demandées
     console.log('[INFO] - Calcul du chemin demandé');
-    console.log('[INFO] - Départ :' + startNode.label +' (id=' + startNode.id + ', étage=' + startNode.floor + ')');
+    console.log('[INFO] - Départ : ' + startNode.label +' (id=' + startNode.id + ', étage=' + startNode.floor + ')');
     console.log('[INFO] - Arrivée : ' + endNode.label   + ' (id=' + endNode.id   + ', étage=' + endNode.floor   + ')');
     console.log('[INFO] - Mode PMR : ' + (document.getElementById('pmr-mode').checked ? 'activé' : 'désactivé'));
 
