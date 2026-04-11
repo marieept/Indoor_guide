@@ -106,6 +106,6 @@ def _draw_segments(image: np.ndarray, segments: list) -> np.ndarray:
     result = image.copy()
 
     for p1, p2 in segments:
-        cv2.line(result, p1, p2, color=0, thickness=2)
+        cv2.line(result, p1, p2, color=0, thickness=8)
 
     return result

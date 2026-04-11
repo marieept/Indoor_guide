@@ -62,30 +62,7 @@ def configure():
     return config
 
 def squelettize(floor):
-    """
-    with Image(filename=floor["svg"]) as wimg:
-        wimg.resize(floor["width"], floor["height"])
-        wimg.format="png"
-        wimg.save(filename=TEMP_PNG)
-        img = cv2.imread(TEMP_PNG, cv2.IMREAD_GRAYSCALE)
 
-    if img is None:
-        print(f"Erreur : impossible de lire {floor['svg']}")
-        exit()
-    """
-
-    """svg_path = floor["svg"]
-    png_fallback = str(Path(svg_path).with_suffix(".png"))
- 
-    if os.path.exists(png_fallback):
-        img = cv2.imread(png_fallback, cv2.IMREAD_GRAYSCALE)
-    else:
-        with Image(filename=svg_path) as wimg:
-            wimg.resize(floor["width"], floor["height"])
-            wimg.format = "png"
-            wimg.save(filename=TEMP_PNG)
-        img = cv2.imread(TEMP_PNG, cv2.IMREAD_GRAYSCALE)"""
-    
     img = _extract_img_from_svg(floor["svg"], grayscale=True)
  
     if img is None:
@@ -100,13 +77,6 @@ def squelettize(floor):
 
     #Version binaire avec des valeurs 0 et 1 pour vérifier si un chemin est libre
     _, navigable = cv2.threshold(img_small, 127, 1, cv2.THRESH_BINARY)
-
-    """#Version binaire avec des valeurs 0 et 255 pour l'érosion
-    _, binary = cv2.threshold(img_small, 127, 255, cv2.THRESH_BINARY)
-
-    #Pour s'éloigner des murs
-    kernel = np.ones((5,5), np.uint8)
-    binary_eroded= cv2.erode(binary, kernel, iterations=5)"""
 
     skeleton = skeletonize(navigable.astype(bool)) #retourne un tableau de booléens (True/False)
     skel = skeleton.astype(np.uint8) #conversion en entiers
