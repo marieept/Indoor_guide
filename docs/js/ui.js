@@ -42,7 +42,7 @@ fetch('assets/graph.json')
         console.log('[TEST] - Structure du graphe OK');
 
         var nb_rooms = data.nodes.filter(n => n.type === 'room').length;
-        var nb_transitions = data.nodes.filter(n => n.type === 'transition').length;
+        var nb_transitions = data.nodes.filter(n => n.type === 'stair' || n.type === 'elevator').length;
         console.log('[INFO] - Salles : ' + nb_rooms + ' / Transitions : ' + nb_transitions);
 
         GRAPH = data;
