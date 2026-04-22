@@ -41,6 +41,10 @@ fetch('assets/graph.json')
         console.assert(data.edges.length >0, '[TEST] - Le graphe ne contient aucune arête');
         console.log('[TEST] - Structure du graphe OK');
 
+        var nb_rooms = data.nodes.filter(n => n.type === 'room').length;
+        var nb_transitions = data.nodes.filter(n => n.type === 'transition').length;
+        console.log('[INFO] - Salles : ' + nb_rooms + ' / Transitions : ' + nb_transitions);
+
         GRAPH = data;
         initMap();
         handleQRParams();
