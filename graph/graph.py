@@ -182,22 +182,23 @@ def make_alias(nom, floor_number):
     
     # Toilettes standardisées
     if "toilettes" in nom_lower or "wc" in nom_lower:
+        genre = ""
         if "femmes" in nom_lower:
-            return f"Toilettes femmes {floor_number}"
+            genre = "femmes "
         elif "hommes" in nom_lower:
-            return f"Toilettes hommes {floor_number}"
+            genre = "hommes "
         elif "pmr" in nom_lower:
-            return f"Toilettes PMR {floor_number}"
-        else:
-            return f"Toilettes {floor_number}"
-
-    # Simplifier les autres salles (ex: "Salle 1.3 porte 1" -> "Salle 1.3")
-    parts = nom.split(" ")
-    if "porte" in nom_lower.split(" "):
-        idx = nom_lower.split(" ").index("porte")
+            genre = "PMR "
+        return f"Toilettes {genre}{floor_number}"
+    
+    # Simplifier les autres salles (ex: "Salle 1.3 Porte 1" -> "Salle 1.3")
+    parts = nom.split()
+    nom_lower_parts = nom_lower.split()
+    if "porte" in nom_lower_parts:
+        idx = nom_lower_parts.index("porte")
         return " ".join(parts[:idx])
-    else:
-        return nom
+    
+    return nom
 
 def put_rooms(floor):
     img_display = _load_display_img(floor)

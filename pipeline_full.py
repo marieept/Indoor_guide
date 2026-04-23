@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 import base64, io
 from PIL import Image as PILImage
+import time
 
 # Racine du projet
 ROOT = Path(__file__).parent.resolve()
@@ -141,9 +142,16 @@ def run_full_pipeline():
 
     for floor in config["etages"]:
         print(f"Etage {floor['floor']}...")
-        clean_floor(floor)
 
+        t0= time.time()
+        clean_floor(floor)
+        t1 =time.time()
+        print(f"[PERF] Nettoyage etage {floor['floor']} : {(t1-t0)*1000:.2f} ms")
+
+        t2= time.time()
         floor_nodes, floor_edges = build_graph_for_floor(floor)
+        t3= time.time()
+        print(f"[PERF] Construction graphe etage {floor['floor']} : {(t3-t2)*1000:.2f} ms")
 
         all_nodes.extend(floor_nodes)
         all_edges.extend(floor_edges)
