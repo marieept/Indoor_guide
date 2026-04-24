@@ -1,0 +1,6 @@
+{
+    "etages": [
+        {"floor": 0, "svg": "assets/plans/rdc_simple.svg"},
+        {"floor": 1, "svg": "assets/plans/f1.svg"}
+    ]
+}

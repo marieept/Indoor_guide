@@ -1,9 +1,6 @@
 let GRAPH={nodes:[], edges:[]};
 
-var FLOOR_IMAGES={
-    0: 'assets/rdc_simple.svg',
-    1: 'assets/f1.svg'
-}
+var FLOOR_IMAGES = {};
 
 var scale;
 if (window.innerWidth <= 768) {
@@ -29,7 +26,14 @@ const wrapper =  document.getElementById('map-wrapper');
 
 var t0_load = performance.now();
 
-fetch('assets/graph.json')
+fetch('assets/config_web.json')
+    .then(r => r.json())
+    .then(config => {
+        config.etages.forEach(floor => {
+            FLOOR_IMAGES[floor.floor] = floor.svg;
+        });
+        return fetch('assets/graph.json');
+    })
     .then(r => r.json())
     .then(data => {
         // Performances et tests
