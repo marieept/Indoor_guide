@@ -120,7 +120,7 @@ def build_graph_for_floor(floor: dict):
         cv2.line(debug_img, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
     # Sauvegarde de l'image
-    cv2.imwrite(f"debug_edges_floor_{floor['floor']}.png", debug_img)
+    cv2.imwrite(str(ROOT / "output" / f"debug_edges_floor_{floor['floor']}.png"), debug_img)
 
     # Rescaling des noeuds ET des poids en tout dernier
     for n in all_floor_nodes:
@@ -139,6 +139,8 @@ def run_full_pipeline():
     config = configure()
     all_nodes = []
     all_edges = []
+
+    Path(config["output"]).parent.mkdir(parents=True, exist_ok=True)
 
     for floor in config["etages"]:
         print(f"Etage {floor['floor']}...")
@@ -160,7 +162,7 @@ def run_full_pipeline():
 
     config["output"] = str(ROOT / config["output"])
     merge_and_save(all_nodes, all_edges, config)
-    print(f"Graphe sauvegarde -> {config['output']}")
+    print(f"Graphe sauvegardé -> {config['output']}")
 
 if __name__ == "__main__":
     run_full_pipeline()

@@ -14,7 +14,6 @@ import base64, io
 from PIL import Image as PILImage
 
 GRAPH_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
-TEMP_PNG = str(GRAPH_DIR / "temp.png")
 
 def _extract_img_from_svg(svg_path: str, grayscale: bool = True) -> np.ndarray:
     tree = ET.parse(svg_path)

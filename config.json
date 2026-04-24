@@ -1,5 +1,5 @@
 {
-  "output": "graph.json",
+  "output": "output/graph.json",
   "etages": [
     { "svg_display": "graph/rdc_simple.svg", "prefix": "f0", "floor": 0 },
     { "svg_display": "graph/f1.svg",  "prefix": "f1", "floor": 1 }
