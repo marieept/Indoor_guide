@@ -32,6 +32,7 @@ fetch('assets/config_web.json')
         config.etages.forEach(floor => {
             FLOOR_IMAGES[floor.floor] = floor.svg;
         });
+        img.src = FLOOR_IMAGES[0];
         return fetch('assets/graph.json');
     })
     .then(r => r.json())
