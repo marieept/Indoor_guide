@@ -236,7 +236,7 @@ function resetAll() {
 
     drawPoints();
 }
-
+/*
 function getQueryParams(){
     const params = new URLSearchParams(window.location.search);
     return {
@@ -254,7 +254,7 @@ window.addEventListener("load", () => {
 
 function findNodeById(id) {
     return graph.nodes.find(n => n.id === id);
-}
+}*/
 
 function enableCalcButton() {
     if (typeof startNode !== "undefined" && typeof endNode !== "undefined" && startNode && endNode) {
