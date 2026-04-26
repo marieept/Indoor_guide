@@ -3,19 +3,17 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
-import base64, io
-from PIL import Image as PILImage
 import time
+import cv2
 
-# Racine du projet
+# Absolute path to the directory containing this file
 ROOT = Path(__file__).parent.resolve()
 os.chdir(ROOT)
 
-# Imports partie plan_processing/
+# Add plan_processinf/ and graph/ to the Python path so their modules can be imported
 sys.path.insert(0, str(ROOT / "plan_processing"))
 from plan_processing.pipeline.process_plan import process
 
-# Imports partie graph/
 sys.path.insert(0, str(ROOT / "graph"))
 from graph import (
     squelettize,
@@ -30,103 +28,123 @@ from graph import (
 )
 
 # Chargement de config.json
-def configure() -> dict:
+def configure():
+    """ Loads the configuration from config.json"""
+    
     config_path = ROOT / "config.json"
+
     if not config_path.exists():
-        raise FileNotFoundError(
-            f"config.json introuvable dans {ROOT}\n"
-            f"Créez-le en suivant le format décrit en en-tête de ce fichier."
-        )
+        raise FileNotFoundError(f"config.json introuvable dans {ROOT}")
+    
     with open(config_path, "r") as f:
         config = json.load(f)
 
     for floor in config["etages"]:
         if "svg_display" not in floor:
-            raise KeyError(
-                f"Étage {floor.get('floor', '?')} : "
-                f"'svg_display' manquant dans config.json"
-            )
+            raise KeyError(f"'svg_display' manquant dans config.json")
         svg_path = ROOT / floor["svg_display"]
         if not svg_path.exists():
-            raise FileNotFoundError(
-                f"Étage {floor.get('floor', '?')} : "
-                f"fichier introuvable : {svg_path}"
-            )
+            raise FileNotFoundError(f"fichier introuvable : {svg_path}")
     return config
 
-# Étape 1 : nettoyage via la pipeline du collègue
-def clean_floor(floor: dict):
-    source = floor["svg_display"]
-    path_processed, path_display = process(file_path=str(ROOT / source))
+def clean_floor(floor):
+    """ Runs the cleaning pipeline on a floor's SVG and computes the scale ratio
+    between the original file and the processed output"""
 
-    floor["svg"]         = str(path_processed)
+    original_svg = floor["svg_display"] # relative path to the original SVG from config.json
+    path_processed, path_display = process(file_path=str(ROOT / original_svg))
+
+    # Update floor with the paths to the processed and display SVG
+    floor["svg"] = str(path_processed)
     floor["svg_display"] = str(path_display)
 
-    # Lire les dimensions originales et processed pour calculer le ratio
-    tree_orig = ET.parse(str(ROOT / source))
+    # Read dimensions of the original SVG (before cleaning)
+    tree_orig = ET.parse(str(ROOT / original_svg))
     root_orig = tree_orig.getroot()
     orig_w = float(root_orig.attrib["width"])
     orig_h = float(root_orig.attrib["height"])
 
+    # Read dimensions of the processed SVG (after cleaning)
     tree_proc = ET.parse(str(path_processed))
     root_proc = tree_proc.getroot()
     proc_w = float(root_proc.attrib["width"])
     proc_h = float(root_proc.attrib["height"])
 
+    # Store processed dimensions (used by graph.py so it has to be like the processed SVG)
     floor["width"]   = int(proc_w)
     floor["height"]  = int(proc_h)
-    # Ratio pour rescaler les coords vers l'espace original (= espace display)
+
+    # Scale ratio to convert node coordinates from processed space to original space
+    # Applied at the end of build_graph_for_floor so that coordinates match the display
     floor["scale_x"] = orig_w / proc_w
     floor["scale_y"] = orig_h / proc_h
 
-# Étapes 2-N : graph interactif
-def build_graph_for_floor(floor: dict):
-    """
-    Exécute toutes les étapes de graph.py pour un étage.
-        - Squelettisation  sur floor["svg"]         (SVG nettoyé)
-        - Affichage salles sur floor["svg_display"]  (SVG avec portes)
-    """
+
+def build_graph_for_floor(floor):
+    """ Runs all graph construction steps for a single floor"""
+
+    # Get scale ratio computed in clean_floor, default 1
     sx = floor.get("scale_x", 1.0)
     sy = floor.get("scale_y", 1.0)
 
+    # Step 1 : skeletonize the cleaned SVG the extract the navigation skeleton
     img_small, img_color, navigable, skel = squelettize(floor)
+
+    # Step 2 : detect nodes from the skeleton
     nodes = detect_nodes(skel, floor)
+
+    # Step 3 : manually add or remove navigation nodes
     nav_nodes = edit_nodes(nodes, img_color, floor)
+
+    # Step 4 : manually place rooms and transitions
     rooms = put_rooms(floor)
     transitions = put_transitions(floor)
 
+    # Step 5 : generate edges between navigation nodes
     edges = generate_edges(nav_nodes, navigable, floor)
+
+    # Step 6 : manually mark stair steps not accessible to PRM (person with reduced mobility)
     edges = put_stairs_pmr(nav_nodes, edges, floor)
+
+    # Step 7 : connect rooms and transitions to the nearest navigation node
     edges = connect_nodes(nav_nodes, rooms, transitions, edges, floor, navigable)
 
     all_floor_nodes = nav_nodes + rooms + transitions
 
-    import cv2
-
-    # Image de debug (copie)
+    # Draw edges on a debug image to visually see the graph
     debug_img = img_color.copy()
-
-    # ⚠️ IMPORTANT : utiliser les noeuds AVANT scaling
     nodes_for_display = nav_nodes + rooms + transitions
 
-    for e in edges:
-        n1 = next(n for n in nodes_for_display if n["id"] == e["from"])
-        n2 = next(n for n in nodes_for_display if n["id"] == e["to"])
+    # img_color is in processed space, so coordinates must be too
+    # so it must be done before scaling
+    for edge in edges:
+        # Find the two nodes connected by this edge
+        n1 = None
+        n2 = None
+        for n in nodes_for_display:
+            if n["id"] == edge["from"]:
+                n1 = n
+            if n["id"] == edge["to"]:
+                n2 = n
+            if n1 and n2: #both nodes found
+                break
 
         x1, y1 = int(n1["x"]) //4, int(n1["y"])//4
         x2, y2 = int(n2["x"]) //4, int(n2["y"])//4
 
-        # Dessin de l'arête
+        # Draw the edge
         cv2.line(debug_img, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
-    # Sauvegarde de l'image
+    # Save the debug image
     cv2.imwrite(str(ROOT / "output" / f"debug_edges_floor_{floor['floor']}.png"), debug_img)
 
-    # Rescaling des noeuds ET des poids en tout dernier
+    # Apply scale ratio to node coordinates and edges weights
+    # Because the image displayed on the website is the original
     for n in all_floor_nodes:
         n["x"] = int(n["x"] * sx)
         n["y"] = int(n["y"] * sy)
 
+    # Average scale ratio for edge weights
     scale_w = (sx + sy) / 2
     for e in edges:
         if "weight" in e:
@@ -134,22 +152,26 @@ def build_graph_for_floor(floor: dict):
 
     return all_floor_nodes, edges
 
-# Pipeline principale
 def run_full_pipeline():
+    """ Runs the full pipeline for all floors : cleaning, graph construction and saving"""
+
     config = configure()
     all_nodes = []
     all_edges = []
 
+    # Create the output directory if it doesn't exist
     Path(config["output"]).parent.mkdir(parents=True, exist_ok=True)
 
     for floor in config["etages"]:
         print(f"Etage {floor['floor']}...")
 
+        # Step 1 : clean the floor plan
         t0= time.time()
         clean_floor(floor)
         t1 =time.time()
         print(f"[PERF] Nettoyage etage {floor['floor']} : {(t1-t0)*1000:.2f} ms")
 
+        # Step 2 : build the graph for this floor
         t2= time.time()
         floor_nodes, floor_edges = build_graph_for_floor(floor)
         t3= time.time()
@@ -160,9 +182,9 @@ def run_full_pipeline():
 
         print(f"Etage {floor['floor']} termine ({len(floor_nodes)} noeuds, {len(floor_edges)} aretes)")
 
+    # Convert output path to absolute path before saving
     config["output"] = str(ROOT / config["output"])
     merge_and_save(all_nodes, all_edges, config)
-    print(f"Graphe sauvegardé -> {config['output']}")
 
 if __name__ == "__main__":
     run_full_pipeline()
