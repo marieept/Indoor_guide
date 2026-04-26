@@ -1,3 +1,5 @@
+// A* pathfinding algorithm, path reconstruction and navigation instruction generation
+
 function getNodeById(id){
     // Find and return the node with the given id in GRAPH.nodes
     id = id.toLowerCase().trim(); 

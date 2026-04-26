@@ -1,3 +1,5 @@
+// Floor plan display, zoom, floor switching and path drawing on the SVG overlay
+
 function applyScale(s) {
     // Apply a zoom scale to the map container
     // The wrapper is resized to match the scaled container so the page scrolls correctly

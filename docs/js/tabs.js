@@ -1,4 +1,7 @@
+// Tab and panel switching for mobile navigation
+
 function switchTab(tab) {
+    // Switch the active tab and panel to the given tab in mobile
     var panels = ['search', 'map', 'instructions'];
 
     for (var i = 0; i < panels.length; i++) {
@@ -11,6 +14,7 @@ function switchTab(tab) {
 }
 
 function syncInstructions() {
+    // Duplicate the instructions in the mobile panel
     var content = document.getElementById('instructions').innerHTML;
     document.getElementById('mobile-instructions-content').innerHTML = content;
 }
