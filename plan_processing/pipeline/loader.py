@@ -1,12 +1,5 @@
-"""
-Boris MOCK
-boris.mock@isen-ouest.yncrea.fr
--------------------------------
 
-L'objectif est de charger un fichier dans les formats suivant:
-    - Obligatoire : PNG, JPG, JPEG, PDF, SVG
-    - Optionnel (à voir si j'ai le temps et si je trouve des fichiers OpenSource) : DWG, DXF
-"""
+
 from pathlib import Path
 import cv2 as cv
 import numpy as np
@@ -17,16 +10,17 @@ from formats.svg_loader import load_svg
 
 def load_plan(file_path):
     """
-    En fonction du formats du fichier appelle un fonction qui va traiter le cas présent
+    this function will treat the file format of PNG, JPEG, PDF, SVG
+    if not error
     :param file_path:
     :return:
     """
-    path = Path(file_path)
+    path = Path(file_path)  # update a character to a path
 
     if not path.exists():
         raise FileNotFoundError(f"Fichier introuvable : {path}")
 
-    extension = path.suffix
+    extension = path.suffix #return the file format
 
     if extension in (".png", ".jpg", ".jpeg"):
         return load_raster(path)
@@ -42,6 +36,10 @@ def load_plan(file_path):
 
 
 def load_raster(path):
+    """
+    read image with openCV
+    :return: an array numpy RGB by conversion BGR
+    """
     image =cv.imread(str(path))
 
     if image is None:
@@ -50,8 +48,8 @@ def load_raster(path):
 
 
 def load_pdf(path):
-    pages = convert_from_path(str(path), poppler_path=POPPLER_PATH)
-    return np.array(pages[0])
+    pages = convert_from_path(str(path), poppler_path=POPPLER_PATH) # return list image
+    return np.array(pages[0])   #we take only the first page
 
 
 
