@@ -1,12 +1,8 @@
 """
-Boris MOCK
-boris.mock@isen-ouest.yncrea.fr
--------------------------------
+morphologic operations to consolidate walls and/or cancel residual noise
 
-Opérations morphologique pour consolider les murs et/ou supprimer le bruit residuel
-
-Le closing (dilatation puis erosion) : ferme des petits trou ou gap dans les murs
-L'opening (erosion puis dilatation) : supprime les petits ilots de bruit.
+Closing (expansion followed by erosion): closes small holes or gaps in the walls.
+Opening (erosion followed by expansion): eliminates small groups of noise.
 """
 
 import cv2 as cv
@@ -17,12 +13,12 @@ from config import MORPH_KERNEL_SIZE, MORPH_ITERATIONS
 
 def clean(image: np.ndarray):
     """
-    prend un image binaire et la nettoie
-    etape : - opening
+    take binary image and clean it
+    step : - opening
             - closing
 
-    :param image: image binaire avec des valeurs 0 ou 255
-    :return: image binaire nettoyée
+    :param image: binary image with values= 0 or 255
+    :return: binary image cleaned
     """
     kernel = cv.getStructuringElement(cv.MORPH_RECT, (MORPH_KERNEL_SIZE, MORPH_KERNEL_SIZE))
 
