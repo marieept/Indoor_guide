@@ -1,24 +1,28 @@
-# ─────────────────────────────────────────────
+
 # Paramètres globaux du pipeline
 # Modifie ici pour ajuster le comportement sans toucher au code
-# ─────────────────────────────────────────────
+# -------------------------------------------------------------
 
+#class in python, use for file path
 from pathlib import Path
+# used for interaction with th os
 import os
 
-# ─── Chemins ───────────────────────────────────────────────────────────────────
-
-BASE_DIR    = Path(__file__).parent
-DATA_DIR    = BASE_DIR / "data" / "plans"
-OUTPUT_DIR  = BASE_DIR / "output/final"
+# Path
+# ----------------------
+BASE_DIR    = Path(__file__).parent #represent the root of the project
+DATA_DIR    = BASE_DIR / "data" / "plans"   #file in
+OUTPUT_DIR  = BASE_DIR / "output/final" #file out
 
 # Poppler — requis par pdf2image (PDF et SVG)
 #POPPLER_PATH = r"C:\Users\boris\Downloads\Release-25.12.0-0\poppler-25.12.0\Library\bin"
+
+#we try to read the environnement variable and if not we take the hard path
 POPPLER_PATH = os.environ.get(
     "POPPLER_PATH",
-    r"C:\Users\marie\Downloads\Release-25.12.0-0\poppler-25.12.0\Library\bin"
+    r"C:\Users\boris\Downloads\Release-25.12.0-0\poppler-25.12.0\Library\bin"
 )
-
+#  if poppler doesn't exist there is error
 if not os.path.isdir(POPPLER_PATH):
     raise EnvironmentError(
         "\nPOPPLER_PATH n'est pas défini. Exemple sous Windows :\n"
@@ -27,28 +31,23 @@ if not os.path.isdir(POPPLER_PATH):
 
 
 
-# ─── Taille de sortie SVG ──────────────────────────────────────────────────────
+# SVG size output
+# fix size of svg plan
+SVG_WIDTH =1200
+SVG_HEIGHT =900
 
-# Taille fixe des 2 SVG livrés à Marie
-# Le plan est redimensionné en conservant les proportions (letterbox)
-SVG_WIDTH  = 1200  # px
-SVG_HEIGHT = 900   # px
+# Binarized
 
-# ─── Binarisation ─────────────────────────────────────────────────────────────
+# threshold value between 0 and 255
+#every pixel over the value become white, and under the value become black
+BINARIZE_THRESHOLD=128
 
-# Seuil pour le seuillage global (0-255)
-# Si le plan est en niveaux de gris, tout pixel > BINARIZE_THRESHOLD → blanc
-BINARIZE_THRESHOLD = 128
+# Morphology
 
-# ─── Morphologie ──────────────────────────────────────────────────────────────
+# size of kernel  closing/opening
+MORPH_KERNEL_SIZE = 3   # odd value
 
-# Taille du kernel pour l'érosion/dilatation (nettoyage des contours)
-MORPH_KERNEL_SIZE = 3  # px, toujours impair
-
-# Nombre d'itérations pour la fermeture morphologique
-MORPH_ITERATIONS = 2
+# Number repetition
+MORPH_ITERATIONS=2  #more repetition equal to less noise
 
 
-#IMAGEMAGICK_PATH = r"C:\Program Files\ImageMagick-7.1.2-Q16-HDRI"
-
-#os.environ["MAGICK_HOME"] = r"C:\Program Files\ImageMagick-7.1.2-Q16-HDRI"
