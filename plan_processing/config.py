@@ -14,13 +14,13 @@ BASE_DIR    = Path(__file__).parent #represent the root of the project
 DATA_DIR    = BASE_DIR / "data" / "plans"   #file in
 OUTPUT_DIR  = BASE_DIR / "output/final" #file out
 
-# Poppler — requis par pdf2image (PDF et SVG)
+# Poppler — require by pdf2image (PDF et SVG)
 #POPPLER_PATH = r"C:\Users\boris\Downloads\Release-25.12.0-0\poppler-25.12.0\Library\bin"
 
 #we try to read the environnement variable and if not we take the hard path
 POPPLER_PATH = os.environ.get(
     "POPPLER_PATH",
-    r"C:\Users\boris\Downloads\Release-25.12.0-0\poppler-25.12.0\Library\bin"
+    r"C:\Users\marie\Downloads\Release-25.12.0-0\poppler-25.12.0\Library\bin"
 )
 #  if poppler doesn't exist there is error
 if not os.path.isdir(POPPLER_PATH):

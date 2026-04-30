@@ -1,20 +1,17 @@
 """
-Boris MOCK
-boris.mock@isen-ouest.yncrea.fr
--------------------------------
-Processus de chaque etape pour le pipeline complet
-ordre :
-    - chargement
-    - binarisation
-    - debruitage
-    - nettoyage morphologique
-    - Calibration
-    - Masque batiment
-    - fermeture des portes
+Process for each step in the complete pipeline
+order:
+    - loading
+    - binarization
+    - denoising
+    - morphological cleaning
+    - calibration
+    - building masking
+    - closing the gates
 """
 
 from pathlib import Path
-
+import cv2 as cv
 import numpy as np
 
 from pipeline.loader     import load_plan
@@ -26,31 +23,10 @@ from calibration.scale   import resize_to_target
 from output.svg_exporter import export
 
 
-def process(file_path: str) -> tuple[Path, Path]:
+def process(file_path: str):
     """
-    Exécute le pipeline complet de traitement d'un plan architectural.
-
-    Étapes :
-        1. Chargement
-        2. Prétraitement (niveaux de gris + débruitage)
-        3. Binarisation
-        4. Nettoyage morphologique
-        5. Boundary (masque extérieur)
-        6. Fermeture des portes
-        7. Redimensionnement à la taille cible
-        8. Export SVG
-
-    Paramètres
-    ----------
-    file_path : str | Path
-        Chemin vers le plan à traiter
-
-    Retourne
-    --------
-    tuple[Path, Path]
-        (chemin SVG traité, chemin SVG affichage)
+    Run the complete process
     """
-
     file_path = Path(file_path)
     plan_name = file_path.stem
 
@@ -63,11 +39,17 @@ def process(file_path: str) -> tuple[Path, Path]:
     print("Binarisation...")
     binary = binarize(gray)
 
+    # Inversion: walls in black, floor in white (image processing convention)
+    binary = cv.bitwise_not(binary)
+
     print("Boundary...")
     bounded = apply_boundary(binary)
 
     print("Fermeture des portes...")
     closed = close_doors(bounded)
+
+    # inversion before export : walls in white, ground in black
+    closed = cv.bitwise_not(closed)
 
     path_processed, path_display = export(closed, file_path, plan_name)
 
